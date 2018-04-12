@@ -7,9 +7,6 @@
           <p>
             Add new document
           </p>
-          <p v-if="isSaving">
-            Uploading...
-          </p>
         </div>
       </form>
     </div>
@@ -37,9 +34,12 @@
         form.append('file',this.attachment.file);
         self = this
         self.isSaving = true
-        axios.post('/upload',form).then(response=>{
+        axios.post('/api/v1/documents/upload',form).then(response => {
           self.$emit('uploadComplete', 'done')
           self.isSaving = false
+        },error=> {
+          self.isSaving = false
+          alert(error.message)
         })
       }
     },
@@ -62,9 +62,18 @@
 
   .dropbox {
     padding: 10px 10px;
-    min-height: 50px;
+    height: 70px;
+    overflow: hidden;
     position: relative;
     cursor: pointer;
+    border: 1px solid lightgray;
+    border-radius: 0.8rem;
+    background: #17a2b8;
+    margin-top: 2rem;
+  }
+
+  .dropbox:hover {
+    background: #007bff;
   }
 
   .dropbox p {

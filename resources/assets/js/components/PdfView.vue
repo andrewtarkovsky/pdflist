@@ -1,31 +1,26 @@
 <template>
   <div class="component-container">
-    <a class="btn btn-primary" @click="show()">view</a>
-
     <div class="container">
-      <div v-if="showModal">
+      <div v-if="url && url.length">
         <transition name="modal">
           <div class="modal-mask">
             <div class="modal-wrapper">
               <div class="modal-container">
 
-                <div class="modal-header">
-                  <div v-if="post_id">view</div>
+                <div class="modal-header" v-on:click="url = ''">
+                  Close Preview
                 </div>
 
                 <div class="modal-body">
-
+                  <a v-bind:href="url" target="new">
+                    Download: {{url}}
+                  </a>
+                  <pdf
+                          :src="url"
+                          v-if="url && url.length"
+                  ></pdf>
                 </div>
 
-                <div class="modal-footer">
-                  <div class="post-form__row">
-                    <a
-                            class="btn btn-primary comment-form__button-save"
-                            v-on:click="submit">
-                      Izveidot
-                    </a>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -37,65 +32,91 @@
 </template>
 
 <script>
+
+  import pdf from 'vue-pdf'
+
   export default {
+    components: {
+      pdf
+    },
     methods: {
       show: function () {
-        let self = this
-        this.getPostData()
-          .then(function (response) {
-            self.showModal = true
-          })
+        this.showModal = true
       },
-      getPostData: function () {
-        if (this.post_id) {
-          let self = this
-          return new Promise((resolve, reject) => {
-            this.$http.get('/get-post/?id=' + this.post_id)
-              .then(function (response) {
-                self.id = response.data.id
-                self.title = response.data.title
-                self.text = response.data.text
-                return resolve(response)
-              })
-              .catch(() => reject)
-          })
-        } else {
-          return new Promise((resolve, reject) => {
-            return resolve([])
-          })
-        }
-      },
-      sendPostData: function () {
-        let self = this
-        return new Promise((resolve, reject) => {
-          let params = {
-            id: self.post_id,
-            title: self.title,
-            text: self.text
-          }
-          let url = self.post_id ? '/update-post/' : '/create-post/'
-          this.$http.post(url, params)
-            .then(function (response) {
-              location.reload()
-              return resolve(response)
-            })
-            .catch(() => reject)
-        })
-      },
-      submit: function () {
-        this.sendPostData()
-      }
     },
-    props: ['post_id'],
-    data: function () {
+    data() {
       return {
-        id: '',
-        title: '',
-        text: '',
-        showModal: false,
+        currentPage: 0,
+        pageCount: 0,
+        showModal: false
       }
     },
-    mounted: function () {
-    }
+    props: ['url']
   }
+
 </script>
+
+<style lang="scss">
+  .modal-mask {
+    position: fixed;
+    z-index: 9998;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, .5);
+    display: table;
+    transition: opacity .3s ease;
+  }
+
+  .modal-wrapper {
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  .modal-container {
+    width: 50%;
+    height: 50%;
+    margin: 0px auto;
+    padding: 20px 30px;
+    background-color: #fff;
+    border-radius: 2px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
+    transition: all .3s ease;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+
+  .modal-header {
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .modal-header h3 {
+    margin-top: 0;
+    color: #42b983;
+  }
+
+  .modal-body {
+    margin: 20px 0;
+    overflow-y: scroll;
+    max-height: 80%;
+  }
+
+  .modal-default-button {
+    float: right;
+  }
+
+  .modal-enter {
+    opacity: 0;
+  }
+
+  .modal-leave-active {
+    opacity: 0;
+  }
+
+  .modal-enter .modal-container,
+  .modal-leave-active .modal-container {
+    -webkit-transform: scale(1.1);
+    transform: scale(1.1);
+  }
+</style>
