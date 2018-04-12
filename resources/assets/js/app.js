@@ -16,6 +16,8 @@ window.Vue = require('vue');
  */
 
 Vue.component('example-component', require('./components/ExampleComponent.vue'));
+Vue.component('uploader', require('./components/Uploader.vue'));
+Vue.component('pdflist', require('./components/PdfList.vue'));
 
 const app = new Vue({
     el: '#app'

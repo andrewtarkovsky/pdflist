@@ -12,5 +12,15 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('index');
 });
+
+Route::get('/pdf', 'PdfController@index');
+Route::get('/image', 'PdfController@image');
+Route::get('/info', 'UtilController@info');
+
+Route::get('/list', 'PdfController@getList');
+Route::get('/get-list', 'PdfController@getList');
+
+Route::get('/existing', 'PdfController@parseExisting');
+Route::post('/upload', 'PdfController@uploadPdf');
